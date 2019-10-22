@@ -21,9 +21,9 @@ from django.urls import path
 from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
-from blockchain.blockchain_project.views.account import *
-from blockchain.blockchain_project.views.deployment import *
-from blockchain.blockchain_project.views.blockchain import *
+from blockchain_project.views.account import *
+from blockchain_project.views.deployment import *
+from blockchain_project.views.blockchain import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,10 +37,10 @@ urlpatterns = [
     path('api/fundraises/request/<int:pk>/reject', DeploymentRejectView.as_view()),
     path('api/fundraises/request/', DeploymentView.as_view()),
     path('api/fundraises/request/<int:pk>', DeploymentDetailView.as_view()),
-    path('api/contract/fundraise/(?P<pk>[0-9a-zA-Z]+)/disapproval', ContractRejectView.as_view()),  # 管理员驳回合约
-    path('api/contract/fundraise/(?P<pk>[0-9a-zA-Z]+)/close', ContractCloseView.as_view()),  # 管理员关闭合约
+    path('api/contract/fundraise/(P<pk>[0-9a-zA-Z]+)/disapproval', ContractRejectView.as_view()),  # 管理员驳回合约
+    path('api/contract/fundraise/(P<pk>[0-9a-zA-Z]+)/close', ContractCloseView.as_view()),  # 管理员关闭合约
     path('api/contract/fundraise/', GetContractView.as_view()),  # 管理员获取所有合约
-    path('/api/fundraises/request/<int:pk>', AgreeDeployView.as_view()),  # 管理员同意代部署合约
+    path('api/fundraises/request/<int:pk>', AgreeDeployView.as_view()),  # 管理员同意代部署合约
 
     # url(r'^album/(?P<pk>[0-9]+)/$', views.AlbumDetail.as_view())
 ]

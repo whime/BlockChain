@@ -12,9 +12,7 @@ from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from captcha.models import CaptchaStore
-from captcha.views import captcha_image
-from blockchain.blockchain_project.serializers.account_serializer import AccountLoginSerializer, \
+from blockchain_project.serializers.account_serializer import AccountLoginSerializer, \
     AccountDetailSerializer, AccountDetailUpdateSerializer, \
     AccountRegistrationSerializer
 import base64

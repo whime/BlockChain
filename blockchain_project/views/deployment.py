@@ -6,8 +6,8 @@ from rest_framework.decorators import permission_classes
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth.models import User
-from blockchain.blockchain_project.models import DeployRequest
-from blockchain.blockchain_project.serializers.deploy_serializer import DeploymentRequestCreationSerializer, \
+from blockchain_project.models import DeployRequest
+from blockchain_project.serializers.deploy_serializer import DeploymentRequestCreationSerializer, \
     DeploymentDetailSerializer
 import base64
 import datetime
