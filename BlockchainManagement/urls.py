@@ -31,14 +31,14 @@ urlpatterns = [
     path('api/account/logout/', AccountLogoutView.as_view()),
     path('api/account/register', AccountRegistrationView.as_view()),
     path('api/account/', AccountDetailView.as_view()),
-    path('api/account/<int:pk>/', AccountDetailView.as_view()),
+    # path('api/account/<int:pk>/', AccountDetailView.as_view()),
     path('api/fundraises/', DeployRequestView.as_view()),
     path('api/fundraises/delete/<int:pk>', DeployRequestView.as_view()),
     path('api/fundraises/request/<int:pk>/reject', DeploymentRejectView.as_view()),
     path('api/fundraises/request/', DeploymentView.as_view()),
     path('api/fundraises/request/<int:pk>', DeploymentDetailView.as_view()),
-    path('api/contract/fundraise/(P<pk>[0-9a-zA-Z]+)/disapproval', ContractRejectView.as_view()),  # 管理员驳回合约
-    path('api/contract/fundraise/(P<pk>[0-9a-zA-Z]+)/close', ContractCloseView.as_view()),  # 管理员关闭合约
+    path('api/contract/fundraise/disapproval/(?P<pk>[0-9a-zA-Z]+)/$', ContractRejectView.as_view()),  # 管理员驳回合约
+    path('api/contract/fundraise/close/(?P<pk>[0-9a-zA-Z]+)/$', ContractCloseView.as_view()),  # 管理员关闭合约
     path('api/contract/fundraise/', GetContractView.as_view()),  # 管理员获取所有合约
     path('api/fundraises/request/<int:pk>', AgreeDeployView.as_view()),  # 管理员同意代部署合约
 
