@@ -16,7 +16,6 @@ class AccountRegistrationSerializer(serializers.Serializer):
 
 class AccountLoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
-    email = serializers.CharField(max_length=254)
     password = serializers.CharField(max_length=254, allow_null=True)
 
 
@@ -30,3 +29,17 @@ class AccountDetailUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username', 'password')
+
+     # 重写update方法
+    def update(self,instance,validated_data):
+
+        password = validated_data.pop('password',None)
+        for (key,value) in validated_data.items():
+            setattr(instance,key,value)
+        if password is not None:
+            # 单独调用set_password方法设置，否则密码无法加密保存
+            instance.set_password(password)
+        instance.save()
+
+        return instance
+

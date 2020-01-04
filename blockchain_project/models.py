@@ -30,12 +30,33 @@ class DeployRequest(models.Model):
     name = models.TextField()
     owner_address = models.TextField()
     target_money = models.IntegerField()
-    ipfs_hashes = models.TextField()
+    # 使用string存储ipfs_hash地址
+    ipfs_hashes = models.CharField(max_length=255)
     add_time = models.DateTimeField(auto_now=True)
-    status = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(3)]
+    state = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(2)]
     )
-    # 1为未处理 2为通过 3为不通过
+    # 0为未处理 1为通过 2为不通过
     # status = models.IntegerField(
     #     validators=[MinValueValidator(1), MaxValueValidator(5)]
     # )
+    #将ipfs_hashes转化为列表返回
+    # def getIpfsHashList(self):
+    #     import ast
+    #     return ast.literal_eval(self.ipfs_hashes)
+
+
+
+
+# 已部署的机构合约
+class DeployedCharityContract(models.Model):
+    owner = models.CharField(max_length=20)
+    charityName = models.CharField(max_length=100)
+    contractAddr = models.CharField(max_length=100)
+
+# 已部署的募捐项目合约
+class DeployedFundraiseContract(models.Model):
+    owner = models.CharField(max_length=100)
+    fundraiseName = models.CharField(max_length=100)
+    targetMoney = models.IntegerField()
+    contractAddr = models.CharField(max_length=100)

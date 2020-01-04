@@ -23,7 +23,7 @@ class AccountLoginView(APIView):
 
     def post(self, request, format=None):
         serializer = AccountLoginSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = authenticate(
                 username=serializer.validated_data['username'], password=serializer.validated_data['password'])
             if user is not None:
@@ -39,7 +39,7 @@ class AccountRegistrationView(APIView):
 
     def post(self, request, format=None):
         serializer = AccountRegistrationSerializer(data=request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             # Create User
             if User.objects.filter(username=serializer.validated_data["username"]).first() != None:
                 return Response(data={"message": "该用户已经存在"}, status=status.HTTP_409_CONFLICT)
@@ -66,8 +66,9 @@ class AccountDetailView(APIView):
     def put(self, request, format=None):
         serializer = AccountDetailUpdateSerializer(
             request.user, data=request.data)
+
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_202_ACCEPTED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
