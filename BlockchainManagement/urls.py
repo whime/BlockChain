@@ -24,6 +24,7 @@ from django.conf import settings
 from blockchain_project.views.account import *
 from blockchain_project.views.deployment import *
 from blockchain_project.views.blockchain import *
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,7 +43,8 @@ urlpatterns = [
     re_path('api/contract/fundraise/(?P<pk>[0-9a-zA-Z]+)$', GetOneContractView.as_view()),  # 管理员获取单个合约信息
     path('api/fundraises/request/<int:pk>', AgreeDeployView.as_view()),  # 管理员同意代部署合约
     path('api/contract/charity',DeployContractView.as_view()),
-    path('api/contract/existedcharity',DeployExistedContractView.as_view())
+    path('api/contract/existedcharity',DeployExistedContractView.as_view()),
+    path('',TemplateView.as_view(template_name="index.html"))
 
     # url(r'^album/(?P<pk>[0-9]+)/$', views.AlbumDetail.as_view())
 ]
