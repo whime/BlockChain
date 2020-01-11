@@ -50,7 +50,7 @@ class DeployRequest(models.Model):
 
 # 已部署的机构合约
 class DeployedCharityContract(models.Model):
-    owner = models.CharField(max_length=20)
+    owner = models.CharField(max_length=50)
     charityName = models.CharField(max_length=100)
     contractAddr = models.CharField(max_length=100)
 
