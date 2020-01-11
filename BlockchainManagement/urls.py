@@ -28,23 +28,22 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/account/login', AccountLoginView.as_view()),
-    path('api/account/logout', AccountLogoutView.as_view()),
-    path('api/account/register', AccountRegistrationView.as_view()),
-    path('api/account', AccountDetailView.as_view()),
-    path('api/fundraises', DeployRequestView.as_view()),
+    path('api/account/login/', AccountLoginView.as_view()),
+    path('api/account/logout/', AccountLogoutView.as_view()),
+    path('api/account/register/', AccountRegistrationView.as_view()),
+    path('api/account/', AccountDetailView.as_view()),
+    path('api/fundraises/', DeployRequestView.as_view()),
+    path('api/fundraises/<int:pk>',DeployRequestDetailView.as_view()),  # 用户查询单个代部署申请
     path('api/fundraises/delete/<int:pk>', DeployRequestView.as_view()),
     path('api/fundraises/request/<int:pk>/reject', DeploymentRejectView.as_view()),
-    path('api/fundraises/request', AllDeployRequestView.as_view()),
-    path('api/fundraises/request/<int:pk>', AgreeDeployView.as_view()),
+    path('api/fundraises/request/', AllDeployRequestView.as_view()),
+    path('api/fundraises/request/agreement/<int:pk>', AgreeDeployView.as_view()),
     re_path('api/contract/fundraise/disapproval/(?P<pk>[0-9a-zA-Z]+)$', ContractRejectView.as_view()),  # 管理员驳回合约
     re_path('api/contract/fundraise/close/(?P<pk>[0-9a-zA-Z]+)$', ContractCloseView.as_view()),  # 管理员关闭合约
-    path('api/contract/fundraise', GetContractView.as_view()),  # 管理员获取所有合约
+    path('api/contract/fundraise/', GetContractView.as_view()),  # 管理员获取所有合约
     re_path('api/contract/fundraise/(?P<pk>[0-9a-zA-Z]+)$', GetOneContractView.as_view()),  # 管理员获取单个合约信息
-    path('api/fundraises/request/<int:pk>', AgreeDeployView.as_view()),  # 管理员同意代部署合约
-    path('api/contract/charity',DeployContractView.as_view()),
-    path('api/contract/existedcharity',DeployExistedContractView.as_view()),
+    path('api/fundraises/request/<int:pk>', OneDeployRequestView.as_view()),  # 查询单个代部署申请
+    path('api/contract/charity/',DeployContractView.as_view()),
+    path('api/contract/existedcharity/',DeployExistedContractView.as_view()),
     path('',TemplateView.as_view(template_name="index.html"))
-
-    # url(r'^album/(?P<pk>[0-9]+)/$', views.AlbumDetail.as_view())
 ]

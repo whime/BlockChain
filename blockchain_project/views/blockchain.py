@@ -18,11 +18,16 @@ from web3.contract import ConciseContract
 from copy import deepcopy
 from blockchain_project.models import DeployedCharityContract
 from blockchain_project.serializers.deploy_serializer import CharitySerializer,FundraiseSerializer
+import pickle
 
 
-compiledContracts = compiled_contract.getCompiledContract()
-charityContract = compiledContracts['charity']
-fundraiseContract = compiledContracts['fundraise']
+# 读取编译之后的合约
+with open("BlockchainManagement/config/contracts.pk","rb") as f:
+    compile_sol=pickle.loads(f.read())
+
+charityContract = compile_sol['./Charity.sol:Charity']
+fundraiseContract = compile_sol['./Fundraise.sol:Fundraise']
+
 
 CharityConfig = {
     "abi": charityContract['abi'],
@@ -38,22 +43,26 @@ FundraiseConfig = {
 POST /api/contract/charity
 ["charity_name","private_key]
 
-
-管理员载入一个已经存在的合约***：
-PUT /api/contract/charity/
-["charity_address]
-
-//上面两个方法互斥
 '''
 
 class DeployContractView(APIView):
     permission_classes = (IsAdminUser,)
 
     def post(self, request, format=None):
+        # 限制只能部署一个机构合约
+        querySet=DeployedCharityContract.objects.all()
+        if len(querySet)!=0:
+            return Response(data={"机构合约已经存在!!"},status=status.HTTP_403_FORBIDDEN)
 
         private_key = request.data['private_key']
         charity_name = request.data["charity_name"]
         w3 = Web3(HTTPProvider('http://localhost:7545'))
+
+        # 保存机构钱包私钥
+        keystore=w3.eth.account.encrypt(private_key,'blockchain')
+        with open('BlockchainManagement/config/keyfile',"w") as f:
+            import json
+            f.write(json.dumps(keystore))
 
         # 创建部署合约事务
         Charity = w3.eth.contract(abi=CharityConfig['abi'],bytecode=CharityConfig['bin'])
@@ -71,7 +80,7 @@ class DeployContractView(APIView):
 
         # 获取交易回执并保存合约地址进数据库
         tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
-        serializer=CharitySerializer(data={'owner':str(request.user),'charityName':charity_name,'contractAddr':tx_receipt.contractAddress})
+        serializer=CharitySerializer(data={'owner':w3.eth.accounts[0],'charityName':charity_name,'contractAddr':tx_receipt.contractAddress})
         if serializer.is_valid():
             serializer.save()
             # 根据合约地址获取合约实例
@@ -83,32 +92,26 @@ class DeployContractView(APIView):
                 addressList.append(contract_instance.functions.fundraises(i).call())
             resSerializer=CharityDeploymentResponseSerializer(data={
                 'name':charity_name,
-                'owner':str(request.user),
+                'owner':w3.eth.accounts[0], # 慈善机构钱包地址默认为本地测试链账户第一个
                 'fundraises':addressList})
             if resSerializer.is_valid():
-                # fundraise = w3.eth.contract(abi=FundraiseConfig['abi'], bytecode=FundraiseConfig['bin'])
-                # fundraise_tx_hash = fundraise.constructor("慈善机构1",contract_instance.address,w3.eth.accounts[1],100).transact({'from':w3.eth.accounts[0],'gas':6000000})
-                # fund_tx_receipt = w3.eth.waitForTransactionReceipt(fundraise_tx_hash)
-                #
-                # print(contract_instance.functions.fundraises(0).call())
-                # fundddd = contract_instance.functions.getFundraiseWithIndex(0).call()
-                # print(fundddd)
-                # fund_instance=w3.eth.contract(abi=FundraiseConfig['abi'],address=fundddd)
-                # print(fund_instance.functions.name().call())
                 return Response(resSerializer.data,status=status.HTTP_200_OK)
             else:   return Response(resSerializer.errors,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-
+    '''
+    查询是否已经存在合约
+    GET /api/contract/charity/
+    '''
     def get(self,request):
         user = request.user
-        contractObject = DeployedCharityContract.objects.get(owner=user)
+        contractObject = DeployedCharityContract.objects.all()
 
-        if contractObject is None:
+        if len(contractObject)==0:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        contractAddr = contractObject.contractAddr
-        charityName = contractObject.charityName
+        contractAddr = contractObject[0].contractAddr
+        charityName = contractObject[0].charityName
 
         w3 = Web3(HTTPProvider('http://localhost:7545'))
         charity = w3.eth.contract(address=contractAddr,abi=CharityConfig['abi'])
@@ -121,24 +124,38 @@ class DeployContractView(APIView):
                 addressList.append(charity.functions.fundraises(i).call())
             resSerializer = CharityDeploymentResponseSerializer(data={
                 'name': charityName,
-                'owner': str(request.user),
+                'owner': w3.eth.accounts[0],
                 'fundraises': addressList})
             if resSerializer.is_valid():
                 return Response(resSerializer.data, status=status.HTTP_200_OK)
             else:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+                return Response(data={"数据序列化出现问题!!"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"无法获取对应地址的合约!!"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
+'''
+管理员载入一个已经存在的合约***：
+POST /api/contract/existedcharity
+["charity_address","private_key"]
+'''
 
 class DeployExistedContractView(APIView):
     permission_classes = (IsAdminUser,)
 
     def post(self,request):
+        # 限制只能部署一个机构合约
+        querySet = DeployedCharityContract.objects.all()
+        if len(querySet) != 0:
+            return Response(data={"机构合约已经存在!!"}, status=status.HTTP_403_FORBIDDEN)
+
         charity_address = request.data['charity_address']
         w3 = Web3(HTTPProvider('http://localhost:7545'))
+        private_key=request.data['private_key']
+        # 保存机构钱包私钥
+        keystore = w3.eth.account.encrypt(private_key, 'blockchain')
+        with open('BlockchainManagement/config/keyfile', "w") as f:
+            import json
+            f.write(json.dumps(keystore))
 
         charity = w3.eth.contract(address=charity_address, abi=CharityConfig['abi'])
         if charity is None:
@@ -147,7 +164,7 @@ class DeployExistedContractView(APIView):
         charity_name = charity.functions.name().call()
         # 保存机构地址等信息进数据库
         serializer = CharitySerializer(
-            data={'owner': str(request.user), 'charityName': charity_name, 'contractAddr': charity.address})
+            data={'owner': w3.eth.accounts[0], 'charityName': charity_name, 'contractAddr': charity.address})
         if serializer.is_valid():
             serializer.save()
             addressList = []
@@ -157,48 +174,13 @@ class DeployExistedContractView(APIView):
                 addressList.append(charity.functions.fundraises(i).call())
             resSerializer = CharityDeploymentResponseSerializer(data={
                 'name': charity_name,
-                'owner': str(request.user),
+                'owner': w3.eth.accounts[0],
                 'fundraises': addressList})
             if resSerializer.is_valid():
                 return Response(resSerializer.data,status=status.HTTP_200_OK)
             else:   return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,data={'机构名或合约地址验证不通过..'})
-
-
-
-'''
-查询是否已经存在合约
-GET /api/contract/charity/
-'''
-class QueryExistingContractView(APIView):
-    def get(self,request):
-        user = request.data['user']
-        contractObject = DeployedCharityContract.objects.get(owner=user)
-        if contractObject is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        contractAddr = contractObject.contractAddr
-        charityName = contractObject.charityName
-
-        w3 = web3(HTTPProvider('http://lcalhost:7545'))
-        charity = w3.eth.contract(address=contractAddr,abi=CharityConfig['abi'])
-
-        if charity is not None:
-            addressList = []
-            # 逐一获取机构合约里的慈善项目合约
-            fundraisesCount = charity.functions.getFundraiseCount().call()
-            for i in range(fundraisesCount):
-                addressList.append(charity.functions.fundraises(i).call())
-            resSerializer = CharityDeploymentResponseSerializer(data={
-                'name': charity_name,
-                'owner': str(request.user),
-                'fundraises': addressList})
-            if resSerializer.is_valid():
-                return Response(resSerializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 
@@ -213,24 +195,15 @@ class ContractRejectView(APIView):
 
     def post(self, request, pk, format=None):
         # 管理员获取机构合约实例
-        contractObject = DeployedCharityContract.objects.get(owner=str(request.user))
+        contractObject = DeployedCharityContract.objects.all()
 
-        if contractObject is None:
+        if len(contractObject)==0:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        contractAddr = contractObject.contractAddr
+        contractAddr = contractObject[0].contractAddr
 
         web3 = Web3(HTTPProvider('http://localhost:7545'))
         charity_contract = web3.eth.contract(address=contractAddr, abi=CharityConfig['abi'],
                                               ContractFactoryClass=ConciseContract)
-
-        # 部署一个募捐项目
-        # TODO(whime):解决部署合约时用户的私钥和账户来源,项目名称
-        result=deployOneFundraiseContract(web3,'252a71ee8377c202ddcaaabd4eafa8f9a61185b523a05ce262e298509f33f0c2'
-                                          ,'mujuan9',contractAddr,web3.eth.accounts[1],1000)
-        if True in result:
-             res=charity_contract.addFundraise(result[1],transact={'from':web3.eth.accounts[0]})
-        else:
-            return Response({'detail':'部署募捐项目出错'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # 遍历机构的所有募捐项目
         fundraisesCount = charity_contract.getFundraiseCount()
@@ -262,24 +235,15 @@ class ContractCloseView(APIView):
 
     def post(self, request, pk, format=None):
         # 管理员获取机构合约实例
-        contractObject = DeployedCharityContract.objects.get(owner=str(request.user))
+        contractObject = DeployedCharityContract.objects.all()
 
-        if contractObject is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        contractAddr = contractObject.contractAddr
+        if  len(contractObject)==0:
+            return Response(data={"机构合约不存在"},status=status.HTTP_404_NOT_FOUND)
+        contractAddr = contractObject[0].contractAddr
 
         web3 = Web3(HTTPProvider('http://localhost:7545'))
         charity_contract = web3.eth.contract(address=contractAddr, abi=CharityConfig['abi'],
                                              ContractFactoryClass=ConciseContract)
-
-        # 预先部署一个募捐项目，测试用，最后将删除
-        # TODO(whime):解决部署合约时用户的私钥和账户来源,项目名称
-        result = deployOneFundraiseContract(web3, '252a71ee8377c202ddcaaabd4eafa8f9a61185b523a05ce262e298509f33f0c2'
-                                            , 'mujuan10', contractAddr, web3.eth.accounts[1], 1000)
-        if True in result:
-            res = charity_contract.addFundraise(result[1], transact={'from': web3.eth.accounts[0]})
-        else:
-            return Response({'detail': '部署募捐项目出错'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # 遍历机构的所有募捐项目
         fundraisesCount = charity_contract.getFundraiseCount()
@@ -287,43 +251,43 @@ class ContractCloseView(APIView):
         # 遍历所有地址查找是否有对应的募捐项目合约
         for i in range(fundraisesCount):
             contract_address = charity_contract.fundraises(i)
-            print(str(i) + ":" + str(contract_address))
             if str(pk) == str(contract_address):
                 address = contract_address
                 # 找出捐款合约地址
                 found = 1
                 break
         if found == 0:  # 找不到返回错误
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(data={"没有对应地址的募捐合约！！"},status=status.HTTP_404_NOT_FOUND)
 
-        donation_instance = web3.eth.contract(address=result[1], abi=FundraiseConfig['abi'])
+        donation_instance = web3.eth.contract(address=pk, abi=FundraiseConfig['abi'])
         contract_close = donation_instance.functions.closeFundraise().call(transaction={'from': web3.eth.accounts[0]})
-        print(contract_close)
         return Response(status=status.HTTP_200_OK)
 
 
 '''
 管理员获取所有合约***：
-GET /api/contract/fundraise/
+GET /api/contract/fundraise
 （调用Charity合约的getFundraiseCount和fundraises数组）
 '''
 class GetContractView(APIView):
     permission_classes = (IsAdminUser,)
 
     def get(self, request, format=None):
-        # 根据用户名获取合约地址
-        charity_contract = DeployedCharityContract.objects.get(owner=str(request.user))
+        # 根据用户名获取机构合约地址
+        charityObjects = DeployedCharityContract.objects.all()
+        if len(charityObjects)==0:
+            return Response(data={"机构合约不存在!!"},status=status.HTTP_404_NOT_FOUND)
         web3 = Web3(HTTPProvider('http://localhost:7545'))
 
         # 获取Charity合约对象
-        contract_instance = web3.eth.contract(address=charity_contract.contractAddr,abi=CharityConfig['abi'] ,
+        contract_instance = web3.eth.contract(address=charityObjects[0].contractAddr,abi=CharityConfig['abi'] ,
                                               ContractFactoryClass=ConciseContract)
         fundraiseCount=contract_instance.getFundraiseCount()
         fundraiseAddrList=[]
         for i in range(0,fundraiseCount):
             fundraiseAddrList.append(contract_instance.fundraises(i))
 
-        return Response(data={'addressList':fundraiseAddrList}, status=status.HTTP_200_OK)
+        return Response(data=fundraiseAddrList, status=status.HTTP_200_OK)
 
 
 '''
@@ -360,14 +324,13 @@ class GetOneContractView(APIView):
 部署一个募捐项目合约
 '''
 
-def deployOneFundraiseContract(web3,private_key,name,charity,owner,targetMoney):
+def deployOneFundraiseContract(web3,fromAccount,private_key,name,charity,owner,targetMoney):
     fundraise = web3.eth.contract(abi=FundraiseConfig['abi'],bytecode=FundraiseConfig['bin'])
     estimate_gas = fundraise.constructor(name,charity,owner,targetMoney).estimateGas()
     fundraise_transaction = fundraise.constructor(name,charity,owner,targetMoney).buildTransaction(
         {
-            # TODO(whime):from 字段如何确定？参数化？
-            'from': web3.eth.accounts[0],
-            'nonce': web3.eth.getTransactionCount(owner),
+            'from': fromAccount,
+            'nonce': web3.eth.getTransactionCount(fromAccount),
             'gasPrice': web3.toWei('20', 'gwei'),
             'gas': estimate_gas
         }
@@ -378,7 +341,6 @@ def deployOneFundraiseContract(web3,private_key,name,charity,owner,targetMoney):
     # 将部署的募捐合约信息写入数据库
     serializer = FundraiseSerializer(data={'owner':owner,'fundraiseName':name,'targetMoney':targetMoney,
                                            'contractAddr':tx_receipt.contractAddress})
-    print(repr(serializer))
     if serializer.is_valid():
         serializer.save()
         return [True,tx_receipt.contractAddress]
@@ -386,3 +348,7 @@ def deployOneFundraiseContract(web3,private_key,name,charity,owner,targetMoney):
         print(serializer.errors)
         return [False]
 
+# 返回一个私有链地址用于用户自行部署合约
+class DeployFundraiseContractBySelf(APIView):
+    def get(self,request,format=None):
+        return Response(data={"http://localhost:7545"},status=status.HTTP_200_OK)

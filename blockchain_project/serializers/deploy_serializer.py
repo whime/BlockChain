@@ -18,7 +18,7 @@ class DeploymentRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=DeployRequest
-        fields=['name','owner','owner_address','target_money','ipfs_hashes','status']
+        fields=['name','owner','owner_address','target_money','ipfs_hashes','state']
     # name = serializers.CharField()
     # owner = User
     # owner_address = serializers.CharField()
@@ -41,7 +41,7 @@ class DeploymentRequestSerializer(serializers.ModelSerializer):
 
 # 已部署机构合约序列化器
 class CharitySerializer(serializers.Serializer):
-    owner = serializers.CharField(max_length=20)
+    owner = serializers.CharField(max_length=50)
     # 机构名唯一
     charityName = serializers.CharField(max_length=100,validators=[UniqueValidator(queryset=DeployedCharityContract.objects.all())])
     contractAddr = serializers.CharField(max_length=100)
@@ -72,5 +72,5 @@ class StringListField(serializers.ListField):
 # 部署机构合约后 response 序列化器
 class CharityDeploymentResponseSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
-    owner = serializers.CharField(max_length=20)
+    owner = serializers.CharField(max_length=50)
     fundraises = StringListField()

@@ -6,25 +6,21 @@
 # @Software: PyCharm
 
 """
-此模块用于返回编译之后的机构合约，项目合约版本
+此模块单独运行，保存合约编译之后的字典进contracts.pk
 """
 
 from solc import compile_files
 import os
-
-contracts = {}  # 存储编译之后的合约接口
+import pickle
 
 
 def getCompiledContract():
 
-    PROJECT_ROOT="BlockchainManagement/config"
-    compile_sol=compile_files([os.path.join(PROJECT_ROOT,"Charity.sol"),os.path.join(PROJECT_ROOT,"Fundraise.sol")])
+    PROJECT_CONFIG="."
+    compile_sol=compile_files([os.path.join(PROJECT_CONFIG,"Charity.sol"),os.path.join(PROJECT_CONFIG,"Fundraise.sol")])
 
-    charity_interface=compile_sol['BlockchainManagement/config/Charity.sol:Charity']
-    fundraise_interface=compile_sol['BlockchainManagement/config/Fundraise.sol:Fundraise']
+    with open("contracts.pk","wb") as f:
+        pickle.dump(compile_sol,f)
 
-    # 保留合约入口
-    contracts['charity']=charity_interface
-    contracts['fundraise']=fundraise_interface
-
-    return contracts
+if __name__=='__main__':
+    getCompiledContract()

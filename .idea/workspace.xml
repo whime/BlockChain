@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fcaf6ab2-d1bc-4e9f-99aa-b6ba80f43285" name="Default" comment="add views">
+    <list default="true" id="fcaf6ab2-d1bc-4e9f-99aa-b6ba80f43285" name="Default" comment="add urls">
+      <change afterPath="$PROJECT_DIR$/BlockchainManagement/config/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlockchainManagement/config/contracts.pk" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BlockchainManagement/config/keyfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BlockchainManagement/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlockchainManagement/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BlockchainManagement/config/compiled_contract.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlockchainManagement/config/compiled_contract.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BlockchainManagement/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/BlockchainManagement/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain_project/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain_project/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain_project/serializers/deploy_serializer.py" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain_project/serializers/deploy_serializer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain_project/views/account.py" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain_project/views/account.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain_project/views/blockchain.py" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain_project/views/blockchain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blockchain_project/views/deployment.py" beforeDir="false" afterPath="$PROJECT_DIR$/blockchain_project/views/deployment.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -63,7 +71,28 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.compiled_contract">
+    <configuration name="compiled_contract" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BlockChain" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/BlockchainManagement/config" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/BlockchainManagement/config/compiled_contract.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="BlockChain" type="Python.DjangoServer" factoryName="Django server">
       <module name="BlockChain" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,6 +115,14 @@
       <option name="useCustomRunCommand" value="false" />
       <option name="customRunCommand" value="" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.compiled_contract" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="StructureViewFactory">
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -98,6 +135,14 @@
       <option name="presentableId" value="Default" />
       <updated>1571733561525</updated>
     </task>
+    <task id="LOCAL-00001" summary="add urls">
+      <created>1578537256086</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1578537256086</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,5 +160,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add urls" />
+    <option name="LAST_COMMIT_MESSAGE" value="add urls" />
   </component>
 </project>

@@ -53,22 +53,30 @@ class AccountRegistrationView(APIView):
 
 
 class AccountLogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
     def post(self, request, format=None):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AccountDetailView(APIView):
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         serializer = AccountDetailSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, format=None):
+        user=request.user
+        data={}
+        data['username']=request.data['username'] if 'username' in request.data else user.username
+        data['password']=request.data['password'] if 'password' in request.data else user.password
+        data['email']=request.data['email'] if 'email' in request.data else user.email
         serializer = AccountDetailUpdateSerializer(
-            request.user, data=request.data)
+            request.user, data=data)
 
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_202_ACCEPTED)
         else:
+            print(serializer.errors)
             return Response(status=status.HTTP_400_BAD_REQUEST)
