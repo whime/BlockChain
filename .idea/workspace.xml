@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fcaf6ab2-d1bc-4e9f-99aa-b6ba80f43285" name="Default" comment="add views">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="fcaf6ab2-d1bc-4e9f-99aa-b6ba80f43285" name="Default" comment="fix bug" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,10 +186,10 @@
       <option name="customRunCommand" value="" />
     </configuration>
     <list>
-      <item itemvalue="Python.blockchain" />
-      <item itemvalue="Python.blockchain (1)" />
-      <item itemvalue="Python.animals" />
       <item itemvalue="Python.animalsReconization" />
+      <item itemvalue="Python.animals" />
+      <item itemvalue="Python.blockchain (1)" />
+      <item itemvalue="Python.blockchain" />
     </list>
     <recent_temporary>
       <list>
