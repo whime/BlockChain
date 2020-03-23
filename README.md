@@ -11,11 +11,11 @@
 ![](https://img.shields.io/badge/solc-3.2.0-lightgrey)
 > python -m pip install -r ./requirements.txt
 #### 主要 API 介绍
-API | description
-- | -
-api/account/|用户登入登出，注册
-api/fundraises/|用于处理用户请求代部署募捐项目的申请，同意/拒绝/删除申请等
-api/contract/|智能合约部署，查询，关闭，驳回等。
+|API | description|
+|- | -|
+|api/account/|用户登入登出，注册|
+|api/fundraises/|用于处理用户请求代部署募捐项目的申请，同意/拒绝/删除申请等|
+|api/contract/|智能合约部署，查询，关闭，驳回等。|
 
 #### 其他说明
 + 智能合约使用本地solc.exe编译器编译，版本为0.5.12+commit.7709ece9.Windows.msvc
