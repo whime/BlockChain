@@ -21,3 +21,5 @@
 + 智能合约使用本地solc.exe编译器编译，版本为0.5.12+commit.7709ece9.Windows.msvc
 + 本地数据库使用mysql,数据库名blockchain，需提前创建
 + 本地测试链使用Ganache部署，并使用postman测试API
++ [踩坑记录](https://blog.csdn.net/whimewcm/article/details/102988634)
+
